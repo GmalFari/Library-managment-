@@ -1,0 +1,322 @@
+{% load static %}
+<!DOCTYPE html>
+<html  lang="ar">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <title>Nouvil</title>
+    <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="{% static 'plugins/jquery_datepacker/jquery_ui.css ' %}">
+    <!-- IonIcons -->
+    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{% static 'dist/css/adminlte_ar.min.css' %}">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+  </head>
+  <body dir="rtl" class="hold-transition sidebar-mini">
+{% include 'parts/nav.html' %}
+{% include 'parts/sidebar.html' %}
+
+{% block content %}
+
+{% endblock %}
+{% include 'parts/footer.html' %}
+
+
+
+
+  
+ <!-- /.content-wrapper -->
+</div>
+
+<!-- REQUIRED SCRIPTS -->
+
+<script src="{% static 'plugins/jquery_datepacker/jquery_ui.js' %}"></script>
+
+<!-- jQuery -->
+<script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+<!-- Bootstrap -->
+<script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- AdminLTE -->
+<script src="{% static 'dist/js/adminlte.js' %}"></script>
+<!-- OPTIONAL SCRIPTS -->
+<script src="{% static 'plugins/chart.js/Chart.min.js' %}"></script>
+
+<script src="{% static 'dist/js/demo.js' %}"></script>
+<!--<script src="dist/js/pages/dashboard3.js'"></script>
+-->
+<script>
+  $(document).ready(function(){
+    $('#myModal').on('shown.bs.modal', function () {
+      $('#myInput').trigger('focus')
+    });
+/*here i will make loop for get id category and status for contact with books */
+/*حساب اجمالي الارباح و هي عبارة عن حاصل جمع سعر الكتب عند البيع بالاضافة الى سعر استعارة الكتاب*/
+  })
+</script>
+
+<script>
+$(function () {
+  'use strict'
+ 
+  var ticksStyle = {
+    fontColor: '#495057',
+    fontStyle: 'bold'
+  }
+
+  var mode = 'index';
+  var intersect = true
+
+  var $salesChart = $('#sales-chart')
+
+  var salesChart  = new Chart($salesChart, {
+
+    type   : 'bar',
+    
+    data   : {
+
+      labels  : [
+          
+        'تفاصيل الارباح',
+
+      ],
+
+
+      datasets: [
+        {
+          backgroundColor: '#007bff',
+          borderColor    : '#007bff',
+          data           : [ 
+               document.querySelector("#soldtotals").textContent,
+          ]
+        },
+        {
+          backgroundColor: '#ced4da',
+          borderColor    : '#ced4da',
+          data           : [ 
+                document.querySelector("#rentedtotals").textContent,
+          ]
+        }
+      ]
+    }, 
+   options: {
+      maintainAspectRatio: false,
+      tooltips           : {
+        mode     : mode,
+        intersect: intersect
+      },
+      hover              : {
+        mode     : mode,
+        intersect: intersect
+      },
+      legend             : {
+        display: false
+      },
+      scales             : {
+        yAxes: [{
+          // display: false,
+          gridLines: {
+            display      : true,
+            lineWidth    : '4px',
+            color        : 'rgba(0, 0, 0, .2)',
+            zeroLineColor: 'transparent'
+          },
+          ticks    : $.extend({
+            beginAtZero: true,
+
+            // Include a dollar sign in the ticks
+            callback: function (value, index, values) {
+              if (value >= 1000) {
+                value /= 1000
+                value += 'k'
+              }
+              return '$' + value
+            }
+          }, ticksStyle)
+        }],
+        xAxes: [{
+          display  : true,
+          gridLines: {
+            display: false
+          },
+          ticks    : ticksStyle
+        }]
+      }
+    }
+  });
+  
+ var pieChart = document.getElementById('visitors-chart').getContext('2d')
+
+  var myPieChart = new Chart(pieChart, {
+    type: 'pie',
+    data: {
+      datasets: [{
+        data: ['{{availablebooks}}','{{rentalbooks}}','{{soldbooks}}'],
+        backgroundColor :["#27c100","#f3545d","#fdaf4b"],
+        borderWidth: 10,
+        
+      }],
+      labels: ['Available', 'Sold', 'Rented'] 
+    },
+    options : {
+      responsive: true, 
+      maintainAspectRatio: false,
+      legend: {
+        position : 'bottom',
+        labels : {
+          fontColor: '#000',
+          fontSize: 15,
+          usePointStyle : true,
+          padding:30
+        }
+      },
+      pieceLabel: {
+        render: 'percentage',
+        fontColor: 'white',
+        fontSize: 14,
+      },
+
+
+    }
+  })
+
+})
+</script>
+
+{% comment %} my script {% endcomment %}
+<script>
+  let catinput = document.querySelector("#catinput");
+  catinput.style.display = 'none';
+  document.querySelector("#addcat").addEventListener("click",function(){
+    catinput.style.display = 'block';
+  })
+
+  document.querySelector("#backcat").addEventListener("click",function(){
+    catinput.style.display = 'none';
+  })
+
+  document.addEventListener("DOMContentLoaded",function(){
+  {% for book in books%}
+  $(".cat{{book.category.id}}").click(function(){
+    $(".bookhide").hide();
+    $(".book{{book.category.id}}").show();
+  })
+ 
+  $(".status{{book.status}}").click(function(){
+    $(".bookhide").hide();
+    $(".book{{book.status}}").show();
+  })
+    {% endfor%}
+    let del = document.querySelector('#del_id'); 
+del.addEventListener('click',function(){
+  if(window.confirm("هل أنت متأكد من الحذف؟ ")){
+  del.type = 'submit';
+  }
+  else {
+    del.type = 'button';
+  }
+});
+del.click = function() {
+$('#del_id').type = 'submit';
+};
+  })
+/////////////////////////////////////////////////////////  update.html
+    // هذه الدالة من أجل الإمتلاء التلقائي للفيلد
+    document.querySelector("#rental_period_id").addEventListener('input' ,function(){
+      var regInput = /^[0-9]+$/;
+      const rental_price = document.querySelector("#rental_price_id");
+      const rental_period = document.querySelector("#rental_period_id");
+      const total_price = document.querySelector("#total_rental_id");
+      if (rental_price.value === ""){
+        rental_price.value = 0;
+        }
+      else{
+        if((!rental_price.value.match(regInput)) | (!rental_period.value.match(regInput))){
+          alert(" not match ")
+        }
+        else {
+       
+          total_price.value = parseFloat(rental_period.value) * parseFloat(rental_price.value);
+          }
+      }
+
+        
+         
+    }
+    )
+
+
+
+document.addEventListener("DOMContentLoaded",function(){
+  var total = 0;
+  var total_rental_book = 0;
+  var total_sold_book = 0;
+  {% for book in books%}
+  // Check for rental 
+  {% if book.status == "rental" %}
+    {% if book.total_rental != None %}
+      total += {{ book.total_rental }}
+      total_rental_book += {{ book.total_rental }}
+      {% endif %}
+  {% endif %}
+  // Check for sold book
+  {% if book.status == "sold" %}
+    {% if book.price != None %}
+      total += {{ book.price }}
+      total_sold_book += {{ book.price }}
+    {% endif %}
+  {% endif%}
+
+{% endfor%}  
+total = total.toFixed(2);
+
+document.querySelector("#totalsalarys").textContent = `${total}$`;
+
+let soldtotals = document.querySelector("#soldtotals");
+soldtotals.textContent = total_sold_book;
+soldtotals.style.display = 'none';
+
+
+let rentedtotals = document.querySelector("#rentedtotals");
+rentedtotals.textContent = total_rental_book;
+rentedtotals.style.display = 'none';
+});
+
+    ///////////////////////////////////////////// 
+  
+</script>
+
+
+<!-- 
+
+<script>
+
+  // in index field
+  $('#catinput').hide();
+  $('#addcat').click(() => $('#catinput').show());
+  $('#backcat').click(() => $('#catinput').hide());
+
+
+// this in delete page 
+document.addEventListener("DOMContentLoaded",function(){
+  let del = document.querySelector('#del_id'); 
+  del.addEventListener('click',function(){
+    alert('هل أنت متأكد من الحذف؟ ');
+    del.type = 'submit';
+  });
+del.click = function() {
+  $('#del_id').type = 'submit';
+}
+});
+
+</script>
+-->
+
+
+</body>
+</html>
